@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identitas Masyarakat Indonesia - Media Pembelajaran Interaktif SD (IFP Edition)</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        body {
+            font-family: 'Fredoka', 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(180deg, #7ad7ff 0%, #cbebff 40%, #e2f5ff 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Wood panel effect */
+        .wood-panel {
+            background: linear-gradient(180deg, #d98838 0%, #b3611d 100%);
+            border: 4px solid #733908;
+            box-shadow: inset 0 2px 0 rgba(255,255,255,0.3), 0 6px 12px rgba(0,0,0,0.25);
+            border-radius: 20px;
+        }
+
+        /* Header title text shadow */
+        .title-text-shadow {
+            text-shadow: 
+                3px 3px 0px #0b5e8c,
+                -3px -3px 0px #0b5e8c,
+                3px -3px 0px #0b5e8c,
+                -3px 3px 0px #0b5e8c,
+                0px 5px 0px #073854,
+                0px 8px 12px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Cartoon style buttons designed for IFP touch screen */
+        .btn-cartoon {
+            transition: all 0.15s ease;
+            box-shadow: 0 5px 0 rgba(0,0,0,0.2);
+            touch-action: manipulation;
+        }
+
+        .btn-cartoon:active {
+            transform: translateY(3px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+
+        .btn-purple {
+            background: linear-gradient(180deg, #9333ea 0%, #6b21a8 100%);
+            border: 2px solid #581c87;
+        }
+
+        .btn-orange {
+            background: linear-gradient(180deg, #f97316 0%, #c2410c 100%);
+            border: 2px solid #9a3412;
+        }
+
+        .btn-teal {
+            background: linear-gradient(180deg, #0d9488 0%, #0f766e 100%);
+            border: 2px solid #115e59;
+        }
+
+        .draggable-card {
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            touch-action: none;
+        }
+
+        .draggable-card:active, .draggable-card.dragging {
+            transform: scale(1.05);
+            opacity: 0.8;
+            z-index: 50;
+        }
+
+        .draggable-card.selected-card {
+            outline: 4px solid #f59e0b;
+            border-color: #f59e0b !important;
+            background-color: #fef3c7 !important;
+            animation: pulse-ring 1.2s infinite;
+        }
+
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.8); }
+            70% { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
+        /* Drop Target Slot optimized for IFP Touch Target */
+        .drop-target {
+            transition: all 0.2s ease;
+            background-color: rgba(255, 255, 255, 0.85);
+            min-height: 58px;
+        }
+
+        .drop-target.drag-over {
+            background-color: #dbeafe !important;
+            border-color: #3b82f6 !important;
+            transform: scale(1.03);
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+        }
+
+        .drop-target.correct-slot {
+            border-color: #22c55e !important;
+            background-color: #f0fdf4 !important;
+        }
+
+        .drop-target.wrong-slot {
+            border-color: #ef4444 !important;
+            background-color: #fef2f2 !important;
+        }
+
+        /* Fixed Anchor Slot for Pakaian Adat */
+        .anchor-slot {
+            background: linear-gradient(135deg, #fef2f2 0%, #ffe4e6 100%);
+            border: 2px solid #f87171;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+
+        .anchor-slot:hover {
+            border-color: #ef4444;
+            background: linear-gradient(135deg, #fee2e2 0%, #fecdd3 100%);
+            transform: scale(1.02);
+        }
+
+        /* Locked / Unlocked Finish button */
+        .btn-locked {
+            background: linear-gradient(180deg, #9ca3af 0%, #6b7280 100%);
+            border: 3px solid #4b5563;
+            color: #e5e7eb;
+            cursor: not-allowed;
+            opacity: 0.95;
+        }
+
+        .btn-unlocked {
+            background: linear-gradient(180deg, #22c55e 0%, #15803d 100%);
+            border: 3px solid #166534;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #14532d, 0 10px 15px rgba(0,0,0,0.25);
+            animation: bounce-ready 1s infinite alternate;
+        }
+
+        @keyframes bounce-ready {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-5px); }
+        }
+
+        .row-number {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            border: 2px solid #7f1d1d;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+        }
+
+        /* Level Selector Cards */
+        .level-card {
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .level-card:hover {
+            transform: translateY(-4px);
+        }
+        .level-card.active-level {
+            border-color: #f59e0b !important;
+            background-color: #fef3c7 !important;
+            box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.4);
+        }
+
+        /* Floating Touch Preview Overlay for IFP Dragging */
+        #touch-drag-avatar {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            display: none;
+            opacity: 0.9;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-radius: 12px;
+        }
+
+        /* Zoom animation for image modal */
+        @keyframes modal-pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-pop {
+            animation: modal-pop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-6 flex flex-col justify-between">
+
+    <!-- Floating Drag Preview for IFP Touch -->
+    <div id="touch-drag-avatar" class="bg-white p-2 rounded-xl border-4 border-amber-400"></div>
+
+    <div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+        <div class="absolute top-4 left-10 text-white/70">
+            <i class="fa-solid fa-cloud text-6xl"></i>
+        </div>
+        <div class="absolute top-12 left-1/3 text-white/60">
+            <i class="fa-solid fa-cloud text-8xl"></i>
+        </div>
+        <div class="absolute top-6 right-24 text-white/70">
+            <i class="fa-solid fa-cloud text-7xl"></i>
+        </div>
+        
+        <div class="absolute bottom-0 w-full h-24 bg-emerald-600 rounded-t-3xl border-t-8 border-emerald-500 shadow-inner flex justify-around items-end opacity-90">
+            <i class="fa-solid fa-leaf text-emerald-800 text-5xl mb-2"></i>
+            <i class="fa-solid fa-seedling text-emerald-400 text-4xl mb-4"></i>
+            <i class="fa-solid fa-leaf text-emerald-700 text-6xl mb-1"></i>
+            <i class="fa-solid fa-seedling text-emerald-300 text-5xl mb-3"></i>
+            <i class="fa-solid fa-leaf text-emerald-800 text-5xl mb-2"></i>
+        </div>
+    </div>
+
+    <!-- START & LEVEL SELECTION MODAL -->
+    <div id="modal-start" class="fixed inset-0 z-50 bg-sky-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 border-8 border-amber-400 shadow-2xl relative text-center space-y-6">
+            
+            <div class="flex items-center justify-center gap-2">
+                <i class="fa-solid fa-flag text-red-600 text-3xl"></i>
+                <h2 class="text-2xl sm:text-4xl font-black text-slate-800 tracking-wide uppercase">PETUALANGAN BUDAYA INDONESIA</h2>
+                <i class="fa-solid fa-flag text-red-600 text-3xl"></i>
+            </div>
+
+            <p class="text-slate-600 font-bold text-sm sm:text-base leading-relaxed">
+                Selamat Datang! Pilihlah <span class="text-amber-600 font-black">Tingkat Kesulitan</span> sebelum memulai permainan mencocokkan identitas kebudayaan daerah Indonesia:
+            </p>
+
+            <!-- Level Selection Options -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <!-- Level 1 Card -->
+                <div onclick="selectLevel(1)" id="card-level-1" class="level-card bg-emerald-50 border-4 border-emerald-300 rounded-2xl p-4 text-center">
+                    <div class="bg-emerald-500 text-white font-black text-xs px-2.5 py-1 rounded-full inline-block mb-2 uppercase">LEVEL 1</div>
+                    <div class="font-extrabold text-slate-800 text-lg">PEMULA</div>
+                    <div class="text-xs text-slate-500 font-bold mt-1">4 Daerah (Acak)</div>
+                    <div class="text-[11px] text-emerald-700 font-extrabold mt-1">16 Isian Target</div>
+                </div>
+
+                <!-- Level 2 Card -->
+                <div onclick="selectLevel(2)" id="card-level-2" class="level-card bg-sky-50 border-4 border-sky-300 rounded-2xl p-4 text-center">
+                    <div class="bg-sky-500 text-white font-black text-xs px-2.5 py-1 rounded-full inline-block mb-2 uppercase">LEVEL 2</div>
+                    <div class="font-extrabold text-slate-800 text-lg">MENENGAH</div>
+                    <div class="text-xs text-slate-500 font-bold mt-1">7 Daerah (Acak)</div>
+                    <div class="text-[11px] text-sky-700 font-extrabold mt-1">28 Isian Target</div>
+                </div>
+
+                <!-- Level 3 Card -->
+                <div onclick="selectLevel(3)" id="card-level-3" class="level-card bg-purple-50 border-4 border-purple-300 rounded-2xl p-4 text-center active-level">
+                    <div class="bg-purple-600 text-white font-black text-xs px-2.5 py-1 rounded-full inline-block mb-2 uppercase">LEVEL 3</div>
+                    <div class="font-extrabold text-slate-800 text-lg">MAHIR</div>
+                    <div class="text-xs text-slate-500 font-bold mt-1">10 Daerah</div>
+                    <div class="text-[11px] text-purple-700 font-extrabold mt-1">40 Isian Target</div>
+                </div>
+            </div>
+
+            <!-- Start Game Action Button -->
+            <button id="btn-start-game" onclick="startGame()" class="w-full bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black text-xl sm:text-2xl py-4 px-8 rounded-2xl shadow-xl hover:scale-105 active:scale-95 transition flex items-center justify-center gap-3 border-4 border-emerald-300">
+                <i class="fa-solid fa-circle-play text-2xl"></i>
+                <span>MULAI PERMAINAN (START)</span>
+            </button>
+            
+            <div class="text-xs font-bold text-slate-500">
+                <i class="fa-solid fa-chalkboard-user text-amber-500 mr-1"></i> Mode Interaktif IFP (Layar Sentuh / Stylus / Mouse)
+            </div>
+
+        </div>
+    </div>
+
+    <div class="relative z-10 max-w-[1600px] mx-auto px-3 sm:px-6 pt-3 flex-grow w-full">
+
+        <!-- Top Header & Audio / IFP Controls -->
+        <header class="flex flex-col md:flex-row items-center justify-between gap-3 mb-3">
+            
+            <!-- Controls: Sound BGM, SFX, Fullscreen & Level Change -->
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="btn-sound-bgm" onclick="toggleBGM()" class="btn-purple text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg ring-4 ring-purple-300" title="Musik Latar Instrumental">
+                    <i id="icon-bgm" class="fa-solid fa-music text-xl"></i>
+                </button>
+                <button id="btn-sound-sfx" onclick="toggleSFX()" class="btn-orange text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg" title="Efek Suara">
+                    <i id="icon-sfx" class="fa-solid fa-volume-high text-xl"></i>
+                </button>
+                <button onclick="toggleFullscreen()" class="btn-teal text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg" title="Layar Penuh (IFP)">
+                    <i class="fa-solid fa-expand text-xl"></i>
+                </button>
+                <button onclick="showStartModal()" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold px-3 py-2 rounded-2xl text-xs flex items-center gap-1.5 shadow transition active:scale-95">
+                    <i class="fa-solid fa-sliders"></i> Ubah Level
+                </button>
+            </div>
+
+            <!-- Main Banner Title -->
+            <div class="text-center">
+                <div class="flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-star text-amber-400 text-2xl sm:text-3xl animate-bounce"></i>
+                    <h1 class="text-2xl sm:text-4xl lg:text-5xl font-black text-amber-400 tracking-wider title-text-shadow uppercase drop-shadow-lg">
+                        IDENTITAS MASYARAKAT INDONESIA
+                    </h1>
+                    <i class="fa-solid fa-star text-amber-400 text-2xl sm:text-3xl animate-bounce"></i>
+                </div>
+                <div class="flex items-center justify-center gap-2 mt-1">
+                    <span id="current-level-badge" class="bg-purple-700 text-amber-300 font-extrabold text-xs px-3 py-0.5 rounded-full border border-purple-400 shadow">
+                        Level 3 (Mahir)
+                    </span>
+                    <span class="bg-emerald-600 text-white font-extrabold text-xs sm:text-sm px-4 py-0.5 rounded-full border border-emerald-300 shadow">
+                        Pendidikan Pancasila – Kelas 4 SD
+                    </span>
+                </div>
+            </div>
+
+            <!-- Progress Tracker -->
+            <div class="flex items-center gap-3 bg-white/90 backdrop-blur-md border-2 border-amber-300 px-4 py-2 rounded-2xl shadow-md">
+                <div class="text-3xl text-amber-500">
+                    <i class="fa-solid fa-square-check"></i>
+                </div>
+                <div>
+                    <div class="text-[10px] sm:text-xs text-slate-500 font-bold uppercase">Kemajuan Terisi</div>
+                    <div class="text-base font-black text-blue-700" id="progress-text">0 / 40 Terisi</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+
+            <!-- LEFT SIDE: Dynamic Answer Board -->
+            <main class="lg:col-span-7 bg-white/95 backdrop-blur-md rounded-3xl p-3 sm:p-4 border-4 border-white shadow-2xl relative">
+                
+                <!-- Table Header Badges -->
+                <div class="grid grid-cols-11 gap-1 sm:gap-2 mb-2 text-center font-extrabold text-xs text-white">
+                    <div class="col-span-1"></div>
+                    <!-- Pre-filled Anchor Header -->
+                    <div class="col-span-2 bg-gradient-to-b from-red-600 to-red-700 border-2 border-red-800 py-1.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1" title="Klik gambar di bawah untuk memperbesar">
+                        <i class="fa-solid fa-shirt text-xs hidden sm:inline"></i>
+                        <span class="truncate">Pakaian Adat 🔍</span>
+                    </div>
+                    <div class="col-span-2 bg-sky-600 border-2 border-sky-700 py-1.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-people-group text-xs hidden sm:inline"></i>
+                        <span class="truncate">Suku Bangsa</span>
+                    </div>
+                    <div class="col-span-2 bg-emerald-600 border-2 border-emerald-700 py-1.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-comments text-xs hidden sm:inline"></i>
+                        <span class="truncate">Bahasa Daerah</span>
+                    </div>
+                    <div class="col-span-2 bg-amber-600 border-2 border-amber-700 py-1.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-utensils text-xs hidden sm:inline"></i>
+                        <span class="truncate">Makanan Khas</span>
+                    </div>
+                    <div class="col-span-2 bg-purple-600 border-2 border-purple-700 py-1.5 px-1 rounded-xl shadow-md flex items-center justify-center gap-1">
+                        <i class="fa-solid fa-masks-theater text-xs hidden sm:inline"></i>
+                        <span class="truncate">Seni Budaya</span>
+                    </div>
+                </div>
+
+                <!-- Numbered Target Rows dynamically rendered based on Level -->
+                <div id="grid-container" class="space-y-1.5">
+                    <!-- Dynamic Rows generated via JS -->
+                </div>
+
+            </main>
+
+            <!-- RIGHT SIDE: Instructions Panel & Card Pools -->
+            <aside class="lg:col-span-5 space-y-3">
+
+                <!-- Instruction Board -->
+                <div class="wood-panel p-3.5 text-white relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-chalkboard-user text-amber-300 text-xl"></i>
+                            <h2 class="text-base sm:text-lg font-black tracking-wide text-amber-200 uppercase drop-shadow">PETUNJUK PAPAN INTERAKTIF (IFP)</h2>
+                        </div>
+                        <button onclick="speakText('Petunjuk Papan Interaktif: Perhatikan gambar Pakaian Adat di setiap baris. Ketuk gambar pakaian adat untuk memperbesar! Pasangkan Suku Bangsa, Bahasa Daerah, Makanan Khas, dan Seni Budaya yang sesuai!')" title="Dengarkan Suara" class="bg-amber-500 hover:bg-amber-400 text-amber-950 p-2 rounded-full w-8 h-8 flex items-center justify-center shadow transition active:scale-95">
+                            <i class="fa-solid fa-volume-high text-xs"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs font-semibold bg-amber-950/40 p-2.5 rounded-xl border border-amber-400/30 leading-relaxed">
+                        📌 <span class="text-amber-300 font-bold">Pakaian Adat</span> adalah soal acuan. <span class="text-amber-200 underline font-bold cursor-pointer">Ketuk gambar pakaian adat</span> untuk memperbesar detailnya!<br>
+                        👉 <span class="text-amber-300 font-bold">Cara 1 (Ketuk & Tempel):</span> Ketuk kartu di bank lalu ketuk kolom tujuan di sebelah kiri.<br>
+                        👉 <span class="text-amber-300 font-bold">Cara 2 (Geser Sentuh):</span> Sentuh & tahan kartu lalu geser ke kolom yang cocok!
+                    </p>
+                </div>
+
+                <!-- CARDS BANK CONTAINERS -->
+                <div class="bg-white/90 backdrop-blur-md rounded-3xl p-3 border-4 border-white shadow-2xl space-y-3 max-h-[640px] overflow-y-auto pr-1">
+
+                    <!-- Category 1: Suku Bangsa Bank -->
+                    <div class="bg-sky-50/80 p-2.5 rounded-2xl border-2 border-sky-200">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="bg-sky-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-people-group"></i> SUKU BANGSA
+                            </span>
+                            <button onclick="speakText('Kategori Suku Bangsa')" class="text-sky-600 hover:text-sky-800 text-xs font-bold">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div id="bank-suku" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 min-h-[50px] p-0.5">
+                            <!-- Dynamic Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Category 2: Bahasa Daerah Bank -->
+                    <div class="bg-emerald-50/80 p-2.5 rounded-2xl border-2 border-emerald-200">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="bg-emerald-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-comments"></i> BAHASA DAERAH
+                            </span>
+                            <button onclick="speakText('Kategori Bahasa Daerah')" class="text-emerald-600 hover:text-emerald-800 text-xs font-bold">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div id="bank-bahasa" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 min-h-[50px] p-0.5">
+                            <!-- Dynamic Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Category 3: Makanan Khas Bank -->
+                    <div class="bg-amber-50/80 p-2.5 rounded-2xl border-2 border-amber-200">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="bg-amber-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-utensils"></i> MAKANAN KHAS
+                            </span>
+                            <button onclick="speakText('Kategori Makanan Khas')" class="text-amber-600 hover:text-amber-800 text-xs font-bold">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div id="bank-makanan" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 min-h-[50px] p-0.5">
+                            <!-- Dynamic Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Category 4: Seni dan Budaya Bank -->
+                    <div class="bg-purple-50/80 p-2.5 rounded-2xl border-2 border-purple-200">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="bg-purple-600 text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                                <i class="fa-solid fa-masks-theater"></i> SENI DAN BUDAYA
+                            </span>
+                            <button onclick="speakText('Kategori Seni dan Budaya')" class="text-purple-600 hover:text-purple-800 text-xs font-bold">
+                                <i class="fa-solid fa-volume-high"></i>
+                            </button>
+                        </div>
+                        <div id="bank-seni" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 min-h-[50px] p-0.5">
+                            <!-- Dynamic Cards -->
+                        </div>
+                    </div>
+
+                </div>
+
+            </aside>
+        </div>
+
+        <div class="mt-4 flex flex-col sm:flex-row items-center justify-between gap-3 bg-white/90 backdrop-blur-md p-3 rounded-2xl border-4 border-white shadow-xl max-w-3xl mx-auto">
+            <div class="flex items-center gap-2 text-slate-700 font-bold text-xs sm:text-sm">
+                <i class="fa-solid fa-circle-info text-amber-500 text-lg"></i>
+                <span id="footer-hint-text">Isi semua kolom pada tabel untuk mengaktifkan tombol periksa!</span>
+            </div>
+
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button onclick="resetGame()" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow active:scale-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Reset
+                </button>
+                <button id="btn-finish" onclick="checkAnswers()" class="btn-locked px-6 py-2.5 rounded-xl font-black text-base flex-1 sm:flex-initial flex items-center justify-center gap-2 transition-all duration-300">
+                    <i id="btn-finish-icon" class="fa-solid fa-lock text-lg"></i>
+                    <span id="btn-finish-text">PERIKSA JAWABAN</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- FOOTER CREDITS -->
+    <footer class="mt-6 text-center z-10 px-4">
+        <div class="inline-block bg-slate-900/80 backdrop-blur-md text-amber-300 font-extrabold text-xs sm:text-sm px-6 py-2 rounded-2xl border border-amber-400/40 shadow-lg tracking-wide">
+            created by : Dimas Turangga Wuisan, S.Pd - UPTD SPF SDN Pujer Baru 2 Maesan Bondowoso
+        </div>
+    </footer>
+
+    <!-- COSTUME IMAGE ENLARGED POPUP MODAL -->
+    <div id="modal-costume-preview" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4" onclick="closeCostumeModalOnBackdrop(event)">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 border-8 border-red-500 shadow-2xl relative text-center space-y-4 animate-pop" onclick="event.stopPropagation()">
+            
+            <!-- Close Button -->
+            <button onclick="closeCostumeModal()" class="absolute -top-4 -right-4 bg-red-600 hover:bg-red-700 text-white w-12 h-12 rounded-full border-4 border-white font-black text-xl flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition" title="Tutup">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Modal Header Badge -->
+            <div class="inline-flex items-center gap-2 bg-red-100 border-2 border-red-300 text-red-700 font-black text-xs px-4 py-1.5 rounded-full uppercase tracking-wider">
+                <i class="fa-solid fa-shirt"></i> DETAIL PAKAIAN ADAT
+            </div>
+
+            <!-- Title & Region -->
+            <div>
+                <h2 id="costume-modal-title" class="text-2xl sm:text-3xl font-black text-slate-800 tracking-wide">Bundo Kanduang</h2>
+                <div id="costume-modal-region" class="text-sm font-extrabold text-amber-600 mt-1">Minangkabau (Sumatera Barat)</div>
+            </div>
+
+            <!-- Enlarged Image Box -->
+            <div class="bg-gradient-to-b from-red-50 to-amber-50 rounded-2xl p-4 border-2 border-red-200 shadow-inner flex items-center justify-center min-h-[220px] sm:min-h-[260px] relative">
+                <div id="costume-modal-img-container" class="w-48 h-48 sm:w-60 sm:h-60 flex items-center justify-center">
+                    <!-- Dynamic Enlarged Image / SVG rendered via JS -->
+                </div>
+            </div>
+
+            <!-- Audio TTS Button & Information -->
+            <div class="flex items-center justify-between bg-slate-100 p-3 rounded-2xl border border-slate-200">
+                <div class="text-left text-xs font-bold text-slate-600 flex-1">
+                    <i class="fa-solid fa-circle-info text-amber-500 mr-1"></i> Pakaian adat daerah ini menjadi acuan utama untuk melengkapi baris tabel.
+                </div>
+                <button id="btn-speak-costume" onclick="speakCurrentCostumeInfo()" class="bg-red-500 hover:bg-red-600 text-white px-3.5 py-2 rounded-xl text-xs font-black shadow flex items-center gap-1.5 shrink-0 ml-2 active:scale-95 transition">
+                    <i class="fa-solid fa-volume-high"></i> Baca Detail
+                </button>
+            </div>
+
+            <!-- Close Action Button -->
+            <button onclick="closeCostumeModal()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-extrabold py-3 rounded-xl shadow transition active:scale-95">
+                Kembali ke Permainan
+            </button>
+
+        </div>
+    </div>
+
+    <!-- SCORE & EVALUATION MODAL -->
+    <div id="modal-result" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-lg w-full p-6 border-4 border-amber-400 shadow-2xl relative text-center space-y-4 max-h-[90vh] overflow-y-auto">
+            
+            <!-- Stars Graphic -->
+            <div id="result-stars" class="flex justify-center gap-2 text-4xl text-amber-400">
+                <i class="fa-solid fa-star animate-pulse"></i>
+                <i class="fa-solid fa-star animate-pulse" style="animation-delay: 0.2s"></i>
+                <i class="fa-solid fa-star animate-pulse" style="animation-delay: 0.4s"></i>
+            </div>
+
+            <h2 id="result-title" class="text-3xl font-black text-slate-800">LUAR BIASA!</h2>
+            <p id="result-subtitle" class="text-slate-600 font-bold text-sm">Evaluasi Hasil Belajar Identitas Kebudayaan Indonesia</p>
+
+            <!-- Score Badge Box -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 text-white py-3 px-6 rounded-2xl shadow-inner inline-block w-full max-w-xs">
+                <div class="text-[10px] uppercase font-black tracking-wider opacity-90">NILAI AKHIR KAMU</div>
+                <div id="result-score" class="text-5xl font-black my-1">100 / 100</div>
+                <div id="result-correct-count" class="text-xs font-extrabold mt-1">40 dari 40 Jawaban Tepat</div>
+            </div>
+
+            <!-- Summary Feedback -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 text-left text-xs space-y-1.5">
+                <div class="font-bold text-slate-700 flex items-center gap-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i> Catatan Pembelajaran:
+                </div>
+                <p id="result-message" class="text-slate-600 leading-relaxed font-medium">
+                    Setiap daerah di Indonesia memiliki keanekaragaman pakaian adat, suku, bahasa, makanan, dan seni budaya yang menjadi kebanggaan Bangsa Indonesia!
+                </p>
+            </div>
+
+            <!-- Modal Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-2 pt-2">
+                <button onclick="resetGame()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-extrabold py-3 px-4 rounded-xl shadow transition active:scale-95 flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-rotate-right"></i> Main Lagi
+                </button>
+                <button onclick="closeModal()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-extrabold py-3 px-4 rounded-xl transition active:scale-95">
+                    Tutup & Lihat Papan
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* Regional Costume SVG & Image Dictionary */
+        const COSTUME_IMAGES = {
+            "p-minang": { file: "bundo-kanduang.png", label: "Bundo Kanduang" },
+            "p-bugis": { file: "baju-bodo.png", label: "Baju Bodo" },
+            "p-melayu": { file: "teluk-belanga.png", label: "Teluk Belanga" },
+            "p-betawi": { file: "sadariah.png", label: "Baju Sadariah" },
+            "p-bali": { file: "payas-agung.png", label: "Payas Agung" },
+            "p-papua": { file: "koteka.png", label: "Koteka" },
+            "p-dawan": { file: "amarasi.png", label: "Baju Amarasi" },
+            "p-ambon": { file: "baju-cele.png", label: "Baju Cele" },
+            "p-madura": { file: "pesaan.png", label: "Adat Madura" },
+            "p-dayak": { file: "taa-sapei-sapaq.png", label: "Ta'a Sapei Sapaq" }
+        };
+
+        const COSTUME_SVGS = {
+            "p-minang": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fef2f2"/><path d="M20,35 L50,15 L80,35 L70,42 L50,30 L30,42 Z" fill="#b91c1c"/><path d="M35,42 L65,42 L60,85 L40,85 Z" fill="#dc2626"/><circle cx="50" cy="28" r="8" fill="#fef08a"/><path d="M30,85 L70,85 L75,110 L25,110 Z" fill="#991b1b"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#7f1d1d">Bundo Kanduang</text></svg>`,
+            "p-bugis": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fdf2f8"/><circle cx="50" cy="25" r="12" fill="#fbcfe8"/><path d="M25,40 L75,40 L70,80 L30,80 Z" fill="#ec4899"/><path d="M30,80 L70,80 L65,110 L35,110 Z" fill="#06b6d4"/><rect x="42" y="12" width="16" height="8" rx="4" fill="#facc15"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#9d174d">Baju Bodo</text></svg>`,
+            "p-melayu": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#f0fdf4"/><circle cx="50" cy="25" r="11" fill="#fed7aa"/><path d="M28,40 L72,40 L68,82 L32,82 Z" fill="#16a34a"/><rect x="30" y="70" width="40" height="15" fill="#facc15"/><path d="M32,85 L68,85 L68,110 L32,110 Z" fill="#15803d"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#14532d">Teluk Belanga</text></svg>`,
+            "p-betawi": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#faf5ff"/><circle cx="50" cy="25" r="11" fill="#fde68a"/><path d="M30,40 L70,40 L65,80 L35,80 Z" fill="#a855f7"/><path d="M35,80 L65,80 L65,110 L35,110 Z" fill="#0284c7"/><rect x="42" y="12" width="16" height="12" rx="3" fill="#1e293b"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#581c87">Baju Sadariah</text></svg>`,
+            "p-bali": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fffbeb"/><path d="M30,22 L70,22 L50,5 Z" fill="#f59e0b"/><circle cx="50" cy="28" r="10" fill="#fde68a"/><path d="M28,42 L72,42 L68,85 L32,85 Z" fill="#b45309"/><path d="M32,85 L68,85 L65,110 L35,110 Z" fill="#78350f"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#78350f">Payas Agung</text></svg>`,
+            "p-papua": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fff7ed"/><path d="M25,12 L75,12 L50,30 Z" fill="#1e293b"/><circle cx="50" cy="30" r="10" fill="#78350f"/><path d="M30,50 L70,50 L65,80 L35,80 Z" fill="#d97706"/><rect x="46" y="80" width="8" height="25" fill="#f59e0b"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#7c2d12">Koteka</text></svg>`,
+            "p-dawan": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fef2f2"/><path d="M30,10 L70,10 L50,28 Z" fill="#eab308"/><circle cx="50" cy="28" r="10" fill="#fca5a5"/><path d="M28,42 L72,42 L68,82 L32,82 Z" fill="#991b1b"/><path d="M32,82 L68,82 L65,110 L35,110 Z" fill="#b91c1c"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#7f1d1d">Baju Amarasi</text></svg>`,
+            "p-ambon": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fef2f2"/><circle cx="50" cy="25" r="11" fill="#fed7aa"/><path d="M30,12 L70,12 L50,25 Z" fill="#dc2626"/><path d="M28,40 L72,40 L68,82 L32,82 Z" fill="#ef4444"/><path d="M32,82 L68,82 L65,110 L35,110 Z" fill="#b91c1c"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#991b1b">Baju Cele</text></svg>`,
+            "p-madura": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#fef2f2"/><circle cx="50" cy="25" r="11" fill="#fca5a5"/><path d="M30,14 L70,14 L50,22 Z" fill="#dc2626"/><path d="M28,40 L72,40 L68,75 L32,75 Z" fill="#000000"/><path d="M35,45 L65,45 L65,70 L35,70 Z" fill="#dc2626"/><path d="M32,75 L68,75 L68,110 L32,110 Z" fill="#1e293b"/><text x="50" y="116" font-size="9" font-weight="bold" text-anchor="middle" fill="#000">Adat Madura</text></svg>`,
+            "p-dayak": `<svg viewBox="0 0 100 120" class="w-full h-full"><rect width="100" height="120" rx="8" fill="#faf5ff"/><path d="M20,10 L80,10 L50,28 Z" fill="#1e293b"/><circle cx="50" cy="28" r="10" fill="#fde68a"/><path d="M28,42 L72,42 L68,82 L32,82 Z" fill="#000000"/><path d="M32,82 L68,82 L65,110 L35,110 Z" fill="#eab308"/><text x="50" y="116" font-size="8" font-weight="bold" text-anchor="middle" fill="#3b0764">Ta'a Sapei Sapaq</text></svg>`
+        };
+
+        const ALL_REGIONAL_DATA = [
+            {
+                id: "minang",
+                name: "Minangkabau (Sumatera Barat)",
+                pakaian: { id: "p-minang", label: "Bundo Kanduang", category: "pakaian" },
+                suku: { id: "s-minang", label: "Minangkabau", category: "suku" },
+                bahasa: { id: "b-minang", label: "Bahasa Minang", category: "bahasa" },
+                makanan: { id: "m-minang", label: "Rendang", category: "makanan" },
+                seni: { id: "a-minang", label: "Tari Piring", category: "seni" }
+            },
+            {
+                id: "bugis",
+                name: "Bugis (Sulawesi Selatan)",
+                pakaian: { id: "p-bugis", label: "Baju Bodo", category: "pakaian" },
+                suku: { id: "s-bugis", label: "Bugis", category: "suku" },
+                bahasa: { id: "b-bugis", label: "Bahasa Bugis", category: "bahasa" },
+                makanan: { id: "m-bugis", label: "Coto Makassar", category: "makanan" },
+                seni: { id: "a-bugis", label: "Tari Pakarena", category: "seni" }
+            },
+            {
+                id: "melayu",
+                name: "Melayu (Riau)",
+                pakaian: { id: "p-melayu", label: "Teluk Belanga", category: "pakaian" },
+                suku: { id: "s-melayu", label: "Melayu", category: "suku" },
+                bahasa: { id: "b-melayu", label: "Bahasa Melayu", category: "bahasa" },
+                makanan: { id: "m-melayu", label: "Gulai Belacan", category: "makanan" },
+                seni: { id: "a-melayu", label: "Tari Zapin", category: "seni" }
+            },
+            {
+                id: "betawi",
+                name: "Betawi (DKI Jakarta)",
+                pakaian: { id: "p-betawi", label: "Baju Sadariah", category: "pakaian" },
+                suku: { id: "s-betawi", label: "Betawi", category: "suku" },
+                bahasa: { id: "b-betawi", label: "Bahasa Betawi", category: "bahasa" },
+                makanan: { id: "m-betawi", label: "Kerak Telor", category: "makanan" },
+                seni: { id: "a-betawi", label: "Ondel-Ondel", category: "seni" }
+            },
+            {
+                id: "bali",
+                name: "Bali",
+                pakaian: { id: "p-bali", label: "Payas Agung", category: "pakaian" },
+                suku: { id: "s-bali", label: "Bali", category: "suku" },
+                bahasa: { id: "b-bali", label: "Bahasa Bali", category: "bahasa" },
+                makanan: { id: "m-bali", label: "Ayam Betutu", category: "makanan" },
+                seni: { id: "a-bali", label: "Tari Kecak", category: "seni" }
+            },
+            {
+                id: "papua",
+                name: "Asmat (Papua)",
+                pakaian: { id: "p-papua", label: "Koteka", category: "pakaian" },
+                suku: { id: "s-papua", label: "Asmat", category: "suku" },
+                bahasa: { id: "b-papua", label: "Bahasa Asmat", category: "bahasa" },
+                makanan: { id: "m-papua", label: "Papeda", category: "makanan" },
+                seni: { id: "a-papua", label: "Tari Asmat", category: "seni" }
+            },
+            {
+                id: "dawan",
+                name: "Dawan (NTT)",
+                pakaian: { id: "p-dawan", label: "Baju Amarasi", category: "pakaian" },
+                suku: { id: "s-dawan", label: "Dawan", category: "suku" },
+                bahasa: { id: "b-dawan", label: "Bahasa Dawan", category: "bahasa" },
+                makanan: { id: "m-dawan", label: "Se'i Sapi", category: "makanan" },
+                seni: { id: "a-dawan", label: "Tari Tebe", category: "seni" }
+            },
+            {
+                id: "ambon",
+                name: "Ambon (Maluku)",
+                pakaian: { id: "p-ambon", label: "Baju Cele", category: "pakaian" },
+                suku: { id: "s-ambon", label: "Ambon", category: "suku" },
+                bahasa: { id: "b-ambon", label: "Bahasa Ambon", category: "bahasa" },
+                makanan: { id: "m-ambon", label: "Sagu Bakar", category: "makanan" },
+                seni: { id: "a-ambon", label: "Tari Cakalale", category: "seni" }
+            },
+            {
+                id: "madura",
+                name: "Madura (Jawa Timur)",
+                pakaian: { id: "p-madura", label: "Adat Madura", category: "pakaian" },
+                suku: { id: "s-madura", label: "Madura", category: "suku" },
+                bahasa: { id: "b-madura", label: "Bahasa Madura", category: "bahasa" },
+                makanan: { id: "m-madura", label: "Soto Madura", category: "makanan" },
+                seni: { id: "a-madura", label: "Karapan Sapi", category: "seni" }
+            },
+            {
+                id: "dayak",
+                name: "Dayak Kenyah (Kalimantan Timur)",
+                pakaian: { id: "p-dayak", label: "Ta'a Sapei Sapaq", category: "pakaian" },
+                suku: { id: "s-dayak", label: "Dayak Kenyah", category: "suku" },
+                bahasa: { id: "b-dayak", label: "Bahasa Dayak", category: "bahasa" },
+                makanan: { id: "m-dayak", label: "Nasi Bekepor", category: "makanan" },
+                seni: { id: "a-dayak", label: "Tari Gong", category: "seni" }
+            }
+        ];
+
+        let currentDifficultyLevel = 3; 
+        let activeRegionalData = [...ALL_REGIONAL_DATA];
+        let totalRowsCount = 10;
+        let totalSlotsRequired = 40;
+
+        let rowAnchors = [];
+        let placedCardsState = {};
+        let selectedSourceCard = null;
+        let soundSFXEnabled = true;
+        let soundBGMEnabled = true; // Enabled by default for ambient game experience
+        let audioCtx = null;
+        let bgmTimer = null;
+        let bgmStep = 0;
+
+        let activeTouchCard = null;
+        let touchAvatar = null;
+        let activeModalCostumeData = null;
+
+        /* Traditional Indonesian Instrumental Pentatonic Scale (Slendro/Pelog inspired notes) */
+        const BGM_NOTES = [
+            261.63, // C4 (Pentas 1)
+            293.66, // D4 (Pentas 2)
+            329.63, // E4 (Pentas 3)
+            392.00, // G4 (Pentas 5)
+            440.00, // A4 (Pentas 6)
+            523.25, // C5 (Pentas 1')
+            587.33, // D5 (Pentas 2')
+            659.25  // E5 (Pentas 3')
+        ];
+
+        /* Melodic Pattern Loop for Instrumental Background Music */
+        const BGM_MELODY_PATTERN = [
+            { note: 0, dur: 0.2, bass: 130.81 }, // C3
+            { note: 2, dur: 0.2, bass: null },
+            { note: 3, dur: 0.2, bass: null },
+            { note: 5, dur: 0.2, bass: null },
+            { note: 4, dur: 0.2, bass: 146.83 }, // D3
+            { note: 3, dur: 0.2, bass: null },
+            { note: 2, dur: 0.2, bass: null },
+            { note: 1, dur: 0.2, bass: null },
+            { note: 0, dur: 0.2, bass: 164.81 }, // E3
+            { note: 3, dur: 0.2, bass: null },
+            { note: 5, dur: 0.2, bass: null },
+            { note: 7, dur: 0.3, bass: null },
+            { note: 5, dur: 0.2, bass: 196.00 }, // G3
+            { note: 4, dur: 0.2, bass: null },
+            { note: 2, dur: 0.2, bass: null },
+            { note: 0, dur: 0.3, bass: null }
+        ];
+
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playBGMStep() {
+            if (!soundBGMEnabled || !audioCtx) return;
+
+            try {
+                const stepData = BGM_MELODY_PATTERN[bgmStep % BGM_MELODY_PATTERN.length];
+                const now = audioCtx.currentTime;
+
+                // Lead Instrument Note (Marimba / Angklung Style Pluck)
+                const freq = BGM_NOTES[stepData.note];
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(freq, now);
+
+                // Soft bell-like envelope
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + stepData.dur + 0.1);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start(now);
+                osc.stop(now + stepData.dur + 0.12);
+
+                // Bass Drone / Kendang Soft Pulse
+                if (stepData.bass) {
+                    const bassOsc = audioCtx.createOscillator();
+                    const bassGain = audioCtx.createGain();
+                    bassOsc.type = 'sine';
+                    bassOsc.frequency.setValueAtTime(stepData.bass, now);
+                    bassGain.gain.setValueAtTime(0.06, now);
+                    bassGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                    bassOsc.connect(bassGain);
+                    bassGain.connect(audioCtx.destination);
+
+                    bassOsc.start(now);
+                    bassOsc.stop(now + 0.36);
+                }
+
+                bgmStep++;
+            } catch (e) {}
+        }
+
+        function startBGMLoop() {
+            initAudio();
+            if (bgmTimer) clearInterval(bgmTimer);
+            bgmStep = 0;
+            bgmTimer = setInterval(playBGMStep, 260); // ~115 BPM rhythm loop
+        }
+
+        function stopBGMLoop() {
+            if (bgmTimer) {
+                clearInterval(bgmTimer);
+                bgmTimer = null;
+            }
+        }
+
+        function playSound(type) {
+            if (!soundSFXEnabled) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'drop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(450, now);
+                    osc.frequency.exponentialRampToValueAtTime(850, now + 0.08);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (type === 'select') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(650, now);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } else if (type === 'success') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.1);
+                    osc.frequency.setValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.35, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
+                    osc.start(now);
+                    osc.stop(now + 0.45);
+                } else if (type === 'remove') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(180, now + 0.1);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+            } catch (e) {}
+        }
+
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'id-ID';
+                utterance.rate = 0.95;
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(() => {});
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function toggleSFX() {
+            soundSFXEnabled = !soundSFXEnabled;
+            const btn = document.getElementById('btn-sound-sfx');
+            const icon = document.getElementById('icon-sfx');
+            if (soundSFXEnabled) {
+                btn.className = "btn-orange text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg";
+                icon.className = "fa-solid fa-volume-high text-xl";
+                playSound('select');
+            } else {
+                btn.className = "bg-slate-400 text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg";
+                icon.className = "fa-solid fa-volume-xmark text-xl";
+            }
+        }
+
+        function toggleBGM() {
+            initAudio();
+            soundBGMEnabled = !soundBGMEnabled;
+            const btn = document.getElementById('btn-sound-bgm');
+            const icon = document.getElementById('icon-bgm');
+            if (soundBGMEnabled) {
+                btn.className = "btn-purple text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg ring-4 ring-purple-300";
+                icon.className = "fa-solid fa-music text-xl animate-spin";
+                startBGMLoop();
+            } else {
+                btn.className = "bg-slate-400 text-white p-3 rounded-2xl w-12 h-12 flex items-center justify-center hover:scale-105 active:scale-95 transition shadow-lg";
+                icon.className = "fa-solid fa-music text-xl";
+                stopBGMLoop();
+            }
+        }
+
+        function selectLevel(level) {
+            currentDifficultyLevel = level;
+            for (let l = 1; l <= 3; l++) {
+                const card = document.getElementById(`card-level-${l}`);
+                if (card) {
+                    if (l === level) {
+                        card.classList.add('active-level');
+                    } else {
+                        card.classList.remove('active-level');
+                    }
+                }
+            }
+            playSound('select');
+        }
+
+        function showStartModal() {
+            document.getElementById('modal-start').classList.remove('hidden');
+        }
+
+        function setupRandomizedLevelData() {
+            const randomizedPool = shuffleArray(ALL_REGIONAL_DATA);
+
+            if (currentDifficultyLevel === 1) {
+                totalRowsCount = 4;
+                activeRegionalData = randomizedPool.slice(0, 4);
+                document.getElementById('current-level-badge').innerText = "Level 1 (Pemula - 4 Daerah Acak)";
+            } else if (currentDifficultyLevel === 2) {
+                totalRowsCount = 7;
+                activeRegionalData = randomizedPool.slice(0, 7);
+                document.getElementById('current-level-badge').innerText = "Level 2 (Menengah - 7 Daerah Acak)";
+            } else {
+                totalRowsCount = 10;
+                activeRegionalData = [...randomizedPool];
+                document.getElementById('current-level-badge').innerText = "Level 3 (Mahir - 10 Daerah)";
+            }
+
+            totalSlotsRequired = totalRowsCount * 4;
+        }
+
+        function startGame() {
+            document.getElementById('modal-start').classList.add('hidden');
+            setupRandomizedLevelData();
+            resetGame(false);
+            playSound('success');
+            if (soundBGMEnabled) {
+                startBGMLoop();
+            }
+        }
+
+        function getCostumeImageHTML(cardId, customClass = "h-11 w-11 object-contain drop-shadow") {
+            const costumeInfo = COSTUME_IMAGES[cardId];
+            if (costumeInfo) {
+                const imgPath = `img/pakaian-adat/${costumeInfo.file}`;
+                const rawSvg = COSTUME_SVGS[cardId] || '';
+                const svgFallback = encodeURIComponent(rawSvg).replace(/'/g, '%27');
+                const safeLabel = costumeInfo.label.replace(/"/g, '&quot;');
+                return `<img src="${imgPath}" alt="${safeLabel}" class="${customClass}" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,${svgFallback}';"/>`;
+            }
+            return `<div class="w-10 h-10 bg-amber-200 rounded-lg flex items-center justify-center text-amber-800 font-bold text-xs"><i class="fa-solid fa-shirt"></i></div>`;
+        }
+
+        function getEnlargedCostumeHTML(cardId) {
+            const costumeInfo = COSTUME_IMAGES[cardId];
+            if (costumeInfo) {
+                const imgPath = `img/pakaian-adat/${costumeInfo.file}`;
+                const rawSvg = COSTUME_SVGS[cardId] || '';
+                const svgFallback = encodeURIComponent(rawSvg).replace(/'/g, '%27');
+                const safeLabel = costumeInfo.label.replace(/"/g, '&quot;');
+                return `<img src="${imgPath}" alt="${safeLabel}" class="max-w-full max-h-56 object-contain drop-shadow-xl animate-pop" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,${svgFallback}';"/>`;
+            }
+            return COSTUME_SVGS[cardId] || '';
+        }
+
+        function renderGameBoard() {
+            const gridContainer = document.getElementById('grid-container');
+            gridContainer.innerHTML = '';
+            rowAnchors = [];
+            placedCardsState = {};
+
+            // Render Rows based on active level count
+            activeRegionalData.forEach((region, index) => {
+                const rowNum = index + 1;
+                rowAnchors.push(region);
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = "grid grid-cols-11 gap-1 sm:gap-2 items-center bg-slate-50/90 hover:bg-amber-50/60 p-1.5 rounded-2xl border-2 border-slate-200 transition shadow-sm";
+
+                rowDiv.innerHTML = `
+                    <!-- Row Index Badge -->
+                    <div class="col-span-1 flex items-center justify-center">
+                        <span class="row-number text-white font-black text-xs sm:text-sm w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center">
+                            ${rowNum}
+                        </span>
+                    </div>
+
+                    <!-- Fixed Anchor Slot (Pakaian Adat) -->
+                    <div class="col-span-2 anchor-slot p-1 sm:p-1.5 rounded-xl flex flex-col items-center justify-center cursor-pointer text-center" onclick="openCostumeModal('${region.pakaian.id}')" title="Ketuk untuk memperbesar gambar pakaian adat">
+                        <div class="w-full h-11 flex items-center justify-center overflow-hidden pointer-events-none">
+                            ${getCostumeImageHTML(region.pakaian.id, "h-11 w-11 object-contain drop-shadow")}
+                        </div>
+                        <div class="text-[10px] sm:text-xs font-black text-red-800 line-clamp-1 mt-0.5 pointer-events-none">
+                            ${region.pakaian.label}
+                        </div>
+                        <div class="text-[9px] text-red-600 font-extrabold flex items-center gap-0.5">
+                            <i class="fa-solid fa-magnifying-glass-plus text-[8px]"></i> Lihat
+                        </div>
+                    </div>
+
+                    <!-- Target Slot 1: Suku -->
+                    <div class="col-span-2 drop-target rounded-xl border-2 border-dashed border-sky-300 p-1 flex flex-col items-center justify-center text-center cursor-pointer relative" 
+                         data-row="${index}" data-category="suku" onclick="handleSlotClick(${index}, 'suku')"
+                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${index}, 'suku')">
+                        <span class="text-[10px] text-sky-400 font-bold placeholder-label">Pilih Suku</span>
+                    </div>
+
+                    <!-- Target Slot 2: Bahasa -->
+                    <div class="col-span-2 drop-target rounded-xl border-2 border-dashed border-emerald-300 p-1 flex flex-col items-center justify-center text-center cursor-pointer relative" 
+                         data-row="${index}" data-category="bahasa" onclick="handleSlotClick(${index}, 'bahasa')"
+                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${index}, 'bahasa')">
+                        <span class="text-[10px] text-emerald-400 font-bold placeholder-label">Pilih Bahasa</span>
+                    </div>
+
+                    <!-- Target Slot 3: Makanan -->
+                    <div class="col-span-2 drop-target rounded-xl border-2 border-dashed border-amber-300 p-1 flex flex-col items-center justify-center text-center cursor-pointer relative" 
+                         data-row="${index}" data-category="makanan" onclick="handleSlotClick(${index}, 'makanan')"
+                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${index}, 'makanan')">
+                        <span class="text-[10px] text-amber-400 font-bold placeholder-label">Pilih Makanan</span>
+                    </div>
+
+                    <!-- Target Slot 4: Seni -->
+                    <div class="col-span-2 drop-target rounded-xl border-2 border-dashed border-purple-300 p-1 flex flex-col items-center justify-center text-center cursor-pointer relative" 
+                         data-row="${index}" data-category="seni" onclick="handleSlotClick(${index}, 'seni')"
+                         ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event, ${index}, 'seni')">
+                        <span class="text-[10px] text-purple-400 font-bold placeholder-label">Pilih Seni</span>
+                    </div>
+                `;
+
+                gridContainer.appendChild(rowDiv);
+            });
+
+            renderCardBanks();
+            updateProgress();
+        }
+
+        function renderCardBanks() {
+            const sukuList = shuffleArray(activeRegionalData.map(r => r.suku));
+            const bahasaList = shuffleArray(activeRegionalData.map(r => r.bahasa));
+            const makananList = shuffleArray(activeRegionalData.map(r => r.makanan));
+            const seniList = shuffleArray(activeRegionalData.map(r => r.seni));
+
+            fillBankContainer('bank-suku', sukuList, 'bg-sky-100 border-sky-400 text-sky-900', 'fa-people-group');
+            fillBankContainer('bank-bahasa', bahasaList, 'bg-emerald-100 border-emerald-400 text-emerald-900', 'fa-comments');
+            fillBankContainer('bank-makanan', makananList, 'bg-amber-100 border-amber-400 text-amber-900', 'fa-utensils');
+            fillBankContainer('bank-seni', seniList, 'bg-purple-100 border-purple-400 text-purple-900', 'fa-masks-theater');
+        }
+
+        function fillBankContainer(containerId, items, styleClass, iconClass) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.id = `card-${item.id}`;
+                card.className = `draggable-card p-2 rounded-xl border-2 ${styleClass} font-extrabold text-xs flex items-center justify-between gap-1 shadow-sm select-none active:scale-95 transition`;
+                card.setAttribute('draggable', 'true');
+                card.setAttribute('data-id', item.id);
+                card.setAttribute('data-category', item.category);
+                card.setAttribute('data-label', item.label);
+
+                card.innerHTML = `
+                    <span class="truncate flex-1 pointer-events-none">${item.label}</span>
+                    <i class="fa-solid ${iconClass} opacity-60 text-xs pointer-events-none"></i>
+                `;
+
+                // Mouse Drag Events
+                card.addEventListener('dragstart', (e) => handleDragStart(e, item));
+                card.addEventListener('dragend', handleDragEnd);
+
+                // Touch Events for IFP Touch screen support
+                card.addEventListener('touchstart', (e) => handleTouchStart(e, item), { passive: false });
+                card.addEventListener('touchmove', handleTouchMove, { passive: false });
+                card.addEventListener('touchend', handleTouchEnd, { passive: false });
+
+                // Tap / Click Handler for Tap-to-Place mode
+                card.addEventListener('click', (e) => handleCardClick(e, item));
+
+                container.appendChild(card);
+            });
+        }
+
+        function handleCardClick(e, item) {
+            e.stopPropagation();
+            playSound('select');
+
+            if (selectedSourceCard && selectedSourceCard.id === item.id) {
+                // Deselect current card
+                clearSelectedCard();
+                return;
+            }
+
+            clearSelectedCard();
+            selectedSourceCard = item;
+            const cardEl = document.getElementById(`card-${item.id}`);
+            if (cardEl) {
+                cardEl.classList.add('selected-card');
+            }
+        }
+
+        function clearSelectedCard() {
+            if (selectedSourceCard) {
+                const cardEl = document.getElementById(`card-${selectedSourceCard.id}`);
+                if (cardEl) {
+                    cardEl.classList.remove('selected-card');
+                }
+                selectedSourceCard = null;
+            }
+        }
+
+        function handleSlotClick(rowIndex, category) {
+            if (selectedSourceCard) {
+                if (selectedSourceCard.category !== category) {
+                    playSound('remove');
+                    return;
+                }
+                placeCardInSlot(selectedSourceCard, rowIndex, category);
+                clearSelectedCard();
+            } else {
+                // If a card is already placed in this slot, return it to the bank upon click
+                const currentPlaced = placedCardsState[`${rowIndex}-${category}`];
+                if (currentPlaced) {
+                    returnCardToBank(rowIndex, category);
+                }
+            }
+        }
+
+        function placeCardInSlot(item, rowIndex, category) {
+            // If card is placed elsewhere on board, remove from previous slot
+            for (let key in placedCardsState) {
+                if (placedCardsState[key] && placedCardsState[key].id === item.id) {
+                    delete placedCardsState[key];
+                    const [r, c] = key.split('-');
+                    clearSlotDOM(r, c);
+                }
+            }
+
+            // Return existing item in target slot if present
+            if (placedCardsState[`${rowIndex}-${category}`]) {
+                returnCardToBank(rowIndex, category, false);
+            }
+
+            placedCardsState[`${rowIndex}-${category}`] = item;
+
+            // Hide element from Bank
+            const bankCard = document.getElementById(`card-${item.id}`);
+            if (bankCard) {
+                bankCard.classList.add('hidden');
+            }
+
+            // Render Card in Target Slot DOM
+            const slotEl = document.querySelector(`.drop-target[data-row="${rowIndex}"][data-category="${category}"]`);
+            if (slotEl) {
+                let badgeStyle = "bg-sky-500 text-white";
+                if (category === 'bahasa') badgeStyle = "bg-emerald-500 text-white";
+                if (category === 'makanan') badgeStyle = "bg-amber-500 text-white";
+                if (category === 'seni') badgeStyle = "bg-purple-500 text-white";
+
+                slotEl.innerHTML = `
+                    <div class="w-full h-full p-1.5 rounded-lg ${badgeStyle} font-black text-xs flex items-center justify-between gap-1 shadow animate-pop">
+                        <span class="truncate">${item.label}</span>
+                        <i class="fa-solid fa-xmark hover:text-red-200 text-xs shrink-0 cursor-pointer" onclick="event.stopPropagation(); returnCardToBank(${rowIndex}, '${category}')"></i>
+                    </div>
+                `;
+            }
+
+            playSound('drop');
+            updateProgress();
+        }
+
+        function returnCardToBank(rowIndex, category, playSoundFx = true) {
+            const key = `${rowIndex}-${category}`;
+            const item = placedCardsState[key];
+            if (!item) return;
+
+            delete placedCardsState[key];
+
+            const bankCard = document.getElementById(`card-${item.id}`);
+            if (bankCard) {
+                bankCard.classList.remove('hidden');
+            }
+
+            clearSlotDOM(rowIndex, category);
+
+            if (playSoundFx) {
+                playSound('remove');
+            }
+            updateProgress();
+        }
+
+        function clearSlotDOM(rowIndex, category) {
+            const slotEl = document.querySelector(`.drop-target[data-row="${rowIndex}"][data-category="${category}"]`);
+            if (slotEl) {
+                let catLabel = "Pilih Suku";
+                let textCol = "text-sky-400";
+                if (category === 'bahasa') { catLabel = "Pilih Bahasa"; textCol = "text-emerald-400"; }
+                if (category === 'makanan') { catLabel = "Pilih Makanan"; textCol = "text-amber-400"; }
+                if (category === 'seni') { catLabel = "Pilih Seni"; textCol = "text-purple-400"; }
+
+                slotEl.innerHTML = `<span class="text-[10px] ${textCol} font-bold placeholder-label">${catLabel}</span>`;
+            }
+        }
+
+        /* Drag Standard HTML5 Events */
+        function handleDragStart(e, item) {
+            e.dataTransfer.setData('text/plain', JSON.stringify(item));
+            playSound('select');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDragEnd(e) {
+            document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drag-over'));
+        }
+
+        function handleDrop(e, rowIndex, category) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            const dataStr = e.dataTransfer.getData('text/plain');
+            if (dataStr) {
+                try {
+                    const item = JSON.parse(dataStr);
+                    if (item.category === category) {
+                        placeCardInSlot(item, rowIndex, category);
+                    } else {
+                        playSound('remove');
+                    }
+                } catch (err) {}
+            }
+        }
+
+        function handleTouchStart(e, item) {
+            if (e.touches.length !== 1) return;
+            activeTouchCard = item;
+
+            touchAvatar = document.getElementById('touch-drag-avatar');
+            touchAvatar.innerText = item.label;
+            touchAvatar.style.display = 'block';
+
+            const touch = e.touches[0];
+            touchAvatar.style.left = touch.clientX + 'px';
+            touchAvatar.style.top = touch.clientY + 'px';
+
+            playSound('select');
+        }
+
+        function handleTouchMove(e) {
+            if (!activeTouchCard || !touchAvatar) return;
+            e.preventDefault();
+
+            const touch = e.touches[0];
+            touchAvatar.style.left = touch.clientX + 'px';
+            touchAvatar.style.top = touch.clientY + 'px';
+
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+            document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drag-over'));
+
+            if (elementUnder) {
+                const slot = elementUnder.closest('.drop-target');
+                if (slot) {
+                    slot.classList.add('drag-over');
+                }
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!activeTouchCard) return;
+
+            if (touchAvatar) {
+                touchAvatar.style.display = 'none';
+            }
+
+            const touch = e.changedTouches[0];
+            const elementUnder = document.elementFromPoint(touch.clientX, touch.clientY);
+
+            document.querySelectorAll('.drop-target').forEach(el => el.classList.remove('drag-over'));
+
+            if (elementUnder) {
+                const slot = elementUnder.closest('.drop-target');
+                if (slot) {
+                    const rowIndex = parseInt(slot.getAttribute('data-row'));
+                    const category = slot.getAttribute('data-category');
+
+                    if (activeTouchCard.category === category) {
+                        placeCardInSlot(activeTouchCard, rowIndex, category);
+                    } else {
+                        playSound('remove');
+                    }
+                }
+            }
+
+            activeTouchCard = null;
+        }
+
+        function updateProgress() {
+            const filledCount = Object.keys(placedCardsState).length;
+            const progressText = document.getElementById('progress-text');
+            progressText.innerText = `${filledCount} / ${totalSlotsRequired} Terisi`;
+
+            const btnFinish = document.getElementById('btn-finish');
+            const btnFinishIcon = document.getElementById('btn-finish-icon');
+            const btnFinishText = document.getElementById('btn-finish-text');
+            const hintText = document.getElementById('footer-hint-text');
+
+            if (filledCount >= totalSlotsRequired) {
+                btnFinish.className = "btn-unlocked px-6 py-2.5 rounded-xl font-black text-base flex-1 sm:flex-initial flex items-center justify-center gap-2 transition-all duration-300";
+                btnFinishIcon.className = "fa-solid fa-paper-plane text-lg";
+                btnFinishText.innerText = "PERIKSA JAWABAN";
+                hintText.innerHTML = `<span class="text-emerald-700 font-extrabold"><i class="fa-solid fa-circle-check text-emerald-600"></i> Semuanya terisi! Klik 'Periksa Jawaban' untuk melihat evaluasi!</span>`;
+            } else {
+                btnFinish.className = "btn-locked px-6 py-2.5 rounded-xl font-black text-base flex-1 sm:flex-initial flex items-center justify-center gap-2 transition-all duration-300";
+                btnFinishIcon.className = "fa-solid fa-lock text-lg";
+                btnFinishText.innerText = "PERIKSA JAWABAN";
+                hintText.innerText = `Lengkapi sisa ${totalSlotsRequired - filledCount} kolom untuk membuka pemeriksaan!`;
+            }
+        }
+
+        function checkAnswers() {
+            const filledCount = Object.keys(placedCardsState).length;
+            if (filledCount < totalSlotsRequired) {
+                speakText("Lengkapi semua kolom pada tabel sebelum memeriksa jawaban!");
+                return;
+            }
+
+            let correctTotal = 0;
+
+            activeRegionalData.forEach((region, rIndex) => {
+                const sukuKey = `${rIndex}-suku`;
+                const bahasaKey = `${rIndex}-bahasa`;
+                const makananKey = `${rIndex}-makanan`;
+                const seniKey = `${rIndex}-seni`;
+
+                const sukuSlot = document.querySelector(`.drop-target[data-row="${rIndex}"][data-category="suku"]`);
+                const bahasaSlot = document.querySelector(`.drop-target[data-row="${rIndex}"][data-category="bahasa"]`);
+                const makananSlot = document.querySelector(`.drop-target[data-row="${rIndex}"][data-category="makanan"]`);
+                const seniSlot = document.querySelector(`.drop-target[data-row="${rIndex}"][data-category="seni"]`);
+
+                if (placedCardsState[sukuKey] && placedCardsState[sukuKey].id === region.suku.id) {
+                    correctTotal++;
+                    if (sukuSlot) sukuSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center correct-slot";
+                } else if (sukuSlot) {
+                    sukuSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center wrong-slot";
+                }
+
+                if (placedCardsState[bahasaKey] && placedCardsState[bahasaKey].id === region.bahasa.id) {
+                    correctTotal++;
+                    if (bahasaSlot) bahasaSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center correct-slot";
+                } else if (bahasaSlot) {
+                    bahasaSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center wrong-slot";
+                }
+
+                if (placedCardsState[makananKey] && placedCardsState[makananKey].id === region.makanan.id) {
+                    correctTotal++;
+                    if (makananSlot) makananSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center correct-slot";
+                } else if (makananSlot) {
+                    makananSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center wrong-slot";
+                }
+
+                if (placedCardsState[seniKey] && placedCardsState[seniKey].id === region.seni.id) {
+                    correctTotal++;
+                    if (seniSlot) seniSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center correct-slot";
+                } else if (seniSlot) {
+                    seniSlot.className = "col-span-2 drop-target rounded-xl border-2 p-1 flex flex-col items-center justify-center text-center wrong-slot";
+                }
+            });
+
+            const score = Math.round((correctTotal / totalSlotsRequired) * 100);
+            showResultModal(score, correctTotal);
+        }
+
+        function showResultModal(score, correctTotal) {
+            const modal = document.getElementById('modal-result');
+            const resultTitle = document.getElementById('result-title');
+            const resultScore = document.getElementById('result-score');
+            const resultCorrectCount = document.getElementById('result-correct-count');
+            const resultMessage = document.getElementById('result-message');
+
+            resultScore.innerText = `${score} / 100`;
+            resultCorrectCount.innerText = `${correctTotal} dari ${totalSlotsRequired} Jawaban Tepat`;
+
+            if (score === 100) {
+                resultTitle.innerText = "SANGAT SEMPURNA! 🎉";
+                resultMessage.innerText = "Hebat sekali! Kamu berhasil mencocokkan seluruh identitas kebudayaan Indonesia dengan sempurna!";
+                playSound('success');
+                if (typeof confetti === 'function') {
+                    confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 } });
+                }
+                speakText("Luar biasa! Nilai kamu seratus sempurna!");
+            } else if (score >= 75) {
+                resultTitle.innerText = "HEBAT BANGET! 👏";
+                resultMessage.innerText = "Kerja bagus! Kamu sudah memahami sebagian besar keberagaman suku, bahasa, makanan, dan seni budaya Indonesia.";
+                playSound('success');
+                speakText(`Kerja bagus! Nilai kamu ${score}`);
+            } else {
+                resultTitle.innerText = "AYO TINGKATKAN! 💪";
+                resultMessage.innerText = "Jangan berkecil hati! Perhatikan kembali warna merah pada tabel untuk mempelajari pasangan kebudayaan yang benar.";
+                playSound('remove');
+                speakText(`Nilai kamu ${score}. Mari coba belajar lagi!`);
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-result').classList.add('hidden');
+        }
+
+        function openCostumeModal(costumeId) {
+            const costumeData = activeRegionalData.find(r => r.pakaian.id === costumeId) || ALL_REGIONAL_DATA.find(r => r.pakaian.id === costumeId);
+            if (!costumeData) return;
+
+            activeModalCostumeData = costumeData;
+
+            document.getElementById('costume-modal-title').innerText = costumeData.pakaian.label;
+            document.getElementById('costume-modal-region').innerText = `Daerah: ${costumeData.name}`;
+
+            const container = document.getElementById('costume-modal-img-container');
+            container.innerHTML = getEnlargedCostumeHTML(costumeId);
+
+            document.getElementById('modal-costume-preview').classList.remove('hidden');
+            playSound('select');
+        }
+
+        function closeCostumeModal() {
+            document.getElementById('modal-costume-preview').classList.add('hidden');
+            activeModalCostumeData = null;
+        }
+
+        function closeCostumeModalOnBackdrop(e) {
+            if (e.target.id === 'modal-costume-preview') {
+                closeCostumeModal();
+            }
+        }
+
+        function speakCurrentCostumeInfo() {
+            if (activeModalCostumeData) {
+                const text = `Pakaian Adat ${activeModalCostumeData.pakaian.label}, berasal dari daerah ${activeModalCostumeData.name}. Suku bangsa: ${activeModalCostumeData.suku.label}, Bahasa: ${activeModalCostumeData.bahasa.label}, Makanan khas: ${activeModalCostumeData.makanan.label}, dan Seni budaya: ${activeModalCostumeData.seni.label}.`;
+                speakText(text);
+            }
+        }
+
+        function resetGame(showConfirm = true) {
+            clearSelectedCard();
+            renderGameBoard();
+            if (showConfirm) {
+                playSound('select');
+            }
+        }
+
+        window.onload = function () {
+            // Setup Level & Game Board
+            setupRandomizedLevelData();
+            renderGameBoard();
+
+            // Enable sound triggers on user gesture
+            document.body.addEventListener('click', () => {
+                initAudio();
+            }, { once: true });
+        };
+    </script>
+</body>
+</html>
